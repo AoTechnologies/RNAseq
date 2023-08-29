@@ -1,0 +1,480 @@
+---
+title: "RNAseq Analysis"
+author: "Aaron Olschefski"
+date: "2023-07-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Load Packages, message=FALSE}
+ASpackaged = function (packages){
+# Antoine Soetewey, Outliers detection in R, Stats and R. Retrieved from https://statsandr.com/blog/outliers-detection-in-r/, accessed on August 27th, 2023.
+  
+  # Install packages not yet installed.
+  installed_packages = packages %in% rownames(installed.packages())
+  if (any(installed_packages == FALSE)) {
+    install.packages(packages[!installed_packages])
+  }
+
+  # Packages loading.
+  invisible(lapply(packages,
+                   library,
+                   character.only = TRUE)
+            )
+}
+
+# Package names.
+packages = c("Rsubread",
+             "GEOquery",
+             "GEOfastq",
+             "biomaRt",
+             "tidyverse",
+             "DESeq2",
+             "purrr",
+             "plotly")
+
+#Load Packages.
+ASpackaged(packages = packages)
+```
+
+```{r Build Genome Index, message=FALSE}
+# To align reads, it's necessary to create a reference index. This is a one-time process and can take a few hours to complete. The Rsubread documentation offers helpful advice on working with genomes, which are available at https://www.gencodegenes.org/. In my case, I utilized the "primary" genome fasta file for humans.
+url = "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_44/GRCh38.primary_assembly.genome.fa.gz"
+destfile = "/hg38/GRCh38.primary.fa"
+download.file(url,
+              destfile)
+buildindex(basename = "hg38",
+           reference = destfile)
+```
+
+```{r Download Fastq Files For ENA Record on GEO, message=FALSE}
+#Set the GEO accession ID.
+GEOnumber = "GSE233138"
+
+# Retrieve the GEO series containing the expression profiles for the experiment, including the test, control, and replicates.
+GSEtext = crawl_gse(GEOnumber)
+
+# Retrieve the GSM sample ID's from the GEO series data.
+GSMnames = extract_gsms(GSEtext)
+
+# Retrieve the SRA meta data.
+SRAmeta = crawl_gsms(GSMnames)
+
+# Download fastq files to the fastq folder. Also extending the default time out as the server is quite slow.
+options(timeout=999999)
+res = get_fastqs(SRAmeta, "fastq")
+
+# Cleanup
+rm(GSEtext, GSMnames, res)
+```
+
+```{r Align Reads, message=FALSE}
+# Directory of fastq files.
+fastqdir = file.path(getwd(),
+                     "fastq")
+
+# List fastq files in fastq directory.
+fastqs = list.files(pattern = ".fastq",
+           full.names = TRUE,
+           path = fastqdir)
+
+# Index location.
+index = file.path(getwd(),
+                  "hg38",
+                  "hg38")
+
+# BAM output file location.
+output = file.path(getwd(),
+                   "bam",
+                   gsub("\\..*$",
+                        ".bam",
+                        basename(fastqs)
+                        )
+                   )
+
+# Create BAM directory.
+dir.create("bam",
+           showWarnings = FALSE)
+
+# Align the fastq files with the hg38 index built above
+align(index = index,
+      readfile1 = fastqs,
+      nthreads = 10,
+      type = "rna",
+      output_file = output)
+
+
+#Remove unnecessary variables
+rm(fastqdir, fastqs, index, output)
+```
+
+```{r}
+# Create a list of the bam files created from the align() function
+bamdir = file.path(getwd(),
+                   "bam")
+
+bamfiles = list.files(pattern = ".bam$",
+                      full.names = TRUE,
+                      path = bamdir)
+
+# Location of annotation file.
+annot.ext = file.path(getwd(),
+                      "hg38",
+                      "assembly.basic.annotation.gtf")
+
+#create the features count matrix
+fc = featureCounts(bamfiles,
+                   annot.ext = annot.ext,
+                   isGTFAnnotationFile = TRUE,
+                   nthreads = 10,
+                   minMQS = 30)
+
+# Cleanup
+rm(bamdir, bamfiles, annot.ext)
+```
+
+```{r Check Lanes before Merging Using PCA}
+id <- paste0(rep(c('CTRL1',
+                   'CTRL2',
+                   'TRT1',
+                   'TRT2'),
+                 each = 6),
+             rep(c('_1',
+                   '_2',
+                   '_3'),
+                 each = 2,
+                 times = 4)
+             )
+
+group = rep(c('CTRL1',
+              'CTRL2',
+              'TRT1',
+              'TRT2'),
+            each = 6)
+
+PCAres = prcomp(t(fc$counts))
+PCAploter = data.frame(PCAres$x,
+                  id,
+                  group)
+
+x_range <- c(min(PCAploter$PC1)*1.05, max(PCAploter$PC1)*1.05)
+y_range <- c(min(PCAploter$PC2)*1.05, max(PCAploter$PC2)*1.05)
+groups = unique(PCAploter$group)
+for (x in 1:length(groups)) {
+  PCAplotersub = PCAploter[PCAploter$group == groups[x],]
+  hovertext = paste("File:",
+                    rownames(PCAplotersub),
+                    "\nGroup: ",
+                    PCAplotersub$group,
+                    "\nID: ",
+                    PCAplotersub$id)
+  plot = plot_ly(PCAplotersub,
+                 x = ~PC1,
+                 y = ~PC2,
+                 text = hovertext,
+                 hoverinfo = 'text',
+                 type = 'scatter',
+                 mode = 'markers'
+                 ) %>% layout(xaxis = list(range = x_range),
+                              yaxis = list(range = y_range))
+  assign(paste0("fig",x),plot)
+}
+annotations = list( 
+  list(    
+    x = 0.2,  
+    y = 1.0,
+    text = "PCA of CTRL1", 
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.8,  
+    y = 1.0,  
+    text = "PCA of CTRL2",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),  
+  list( 
+    x = 0.2,  
+    y = 0.45,  
+    text = "PCA of TRT1",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ),
+  list( 
+    x = 0.8,  
+    y = 0.45,  
+    text = "PCA of TRT2",  
+    xref = "paper",  
+    yref = "paper",  
+    xanchor = "center",  
+    yanchor = "bottom",  
+    showarrow = FALSE 
+  ))
+subplot(fig1,
+        fig2,
+        fig3,
+        fig4,
+        nrows = 2,
+        shareX = TRUE,
+        shareY = TRUE) %>% 
+  layout(annotations = annotations,
+         showlegend=FALSE)
+rm(id, group, PCAploter, x_range, y_range, groups, x, PCAplotersub, hovertext, plot, annotations)
+```
+
+```{r}
+#Set the ensembl set to use
+ensembl = useEnsembl(biomart = "genes",
+                      dataset = "hsapiens_gene_ensembl")
+
+#Create a cross reference list for the genes by NCBI ID
+genecrossref = getBM(attributes = c('ensembl_gene_id',
+                                    'external_gene_name'),
+                     mart = ensembl)
+
+#Create a design matrix for the experiment.
+design = data.frame(id = paste0(rep(c('CTRL1',
+                                 'CTRL2',
+                                 'TRT1',
+                                 'TRT2'),
+                               each = 3),
+                           rep(c('_1',
+                                 '_2',
+                                 '_3'),
+                               times = 4)
+                           ),
+                    condition = rep(c('control1',
+                                       'control2',
+                                       'treatment1',
+                                       'treatment2'),
+                                     each = 3)
+                    )
+
+
+#Each sample was ran on two lanes of a flow cell. The counts for each sample are split between two columns and need to be combined. Two input variables are required, the number of lanes per sample and the total number of samples.
+lanes = 2
+samples =12
+dfcountstmp = data.frame(fc$counts)
+dfcount = data.frame(row.names = rownames(fc$counts))
+  first = seq(from = 1,
+              to = lanes*samples,
+              by = lanes)
+  second = seq(from = lanes,
+               to = lanes*samples,
+               by = lanes)
+for (x in 1:samples) {
+  dfcount[,design$id[x]] = data.frame(rowSums(dfcountstmp[first[x]:second[x]]))
+}
+
+#Get the NCBI ID from rowname to a column as an integar
+dfcount = rownames_to_column(dfcount, var = "ensembl_gene_id")
+dfcount$ensembl_gene_id = sub("\\..*", "", dfcount$ensembl_gene_id)
+
+#Remove unnecessary variables
+rm(bamfiles,first, second, lanes, samples, x, ensembl, dfcountstmp, fc)
+```
+
+```{r}
+#Create a design matrix for DESeq results
+designconditions = data.frame(first = c("control1",
+                                        "control2",
+                                        "control2"),
+                            second = c("control2",
+                                       "treatment1",
+                                       "treatment2")
+                            )
+#Create the DESeqDataSet object. The tidy option implies whether the first column of countData is the row names for the count matrix.
+dds <- DESeqDataSetFromMatrix(countData=dfcount, 
+                              colData=design, 
+                              design=~condition,
+                              tidy = TRUE)
+#Run DESeq2.
+dds <- DESeq(dds)
+
+#Store the results.
+for (x in 1:nrow(designconditions)) {
+  #Create the name for the table
+  tablename = paste0("res_",designconditions[x,1],"_",designconditions[x,2])
+  
+  #Create the DEseq results table for the specified conditions
+  assign(tablename,
+         data.frame(results(dds,contrast = c("condition",
+                                designconditions[x,2],
+                                designconditions[x,1])
+                            )
+                    ) %>% 
+           arrange(padj)
+         )
+  
+  #Assign the row names to a column labeled entrezgene_id
+  assign(tablename,
+         rownames_to_column(get(tablename),
+                            var = "ensembl_gene_id")
+         )
+  
+  #Combine the gene names
+  assign(tablename,
+         left_join(x = get(tablename),
+                   y = genecrossref))
+  #Reorder the dataframe
+  assign(tablename,
+         get(tablename)[,c(1,8,2:7)])
+}
+
+#Remove unnecessary variables
+rm(dds, tablename, x)
+```
+
+```{r}
+#Set the P-Value for the 
+p = 0.20
+
+control = res_control_treatment1[res_control_treatment1$padj <= p &
+                         is.na(res_control_treatment1$padj) == FALSE,]
+kd1 = res_treatment1_treatment2[res_treatment1_treatment2$padj <= p &
+                         is.na(res_treatment1_treatment2$padj) == FALSE,]
+kd2 = res_treatment1_treatment3[res_treatment1_treatment3$padj <= p &
+                         is.na(res_treatment1_treatment3$padj) == FALSE,]
+
+kdgenes = inner_join(kd1,kd2, by = "ensembl_gene_id")[,c(1,2,4,8,11,15)]
+xpo7_gene_list = anti_join(kdgenes,control, by = 'ensembl_gene_id')
+colnames(xpo7_gene_list) = c("ensembl_gene_id",
+                      "gene",
+                      "log2_C2T1",
+                      "ADJp_C2T1",
+                      "log2_C2T2",
+                      "ADJp_C2T2")
+
+rm(p,control,kd1,kd2,kdgenes)
+```
+
+```{r Close Out}
+# Print session info, and cite sources of packages used.
+sessionInfo()
+cat("\n")
+sort(packages) %>%
+    map(citation) %>%
+    setNames(sort(packages)) %>%
+    print(style = "text")
+```
+
+
+
+
+
+
+```{r Extra Stuff}
+props <- propmapped(files=bamfiles[1])
+# Extract quality scores
+qs <- qualityScores(filename=fastqfiles[1],nreads=100)
+data.frame(qs)
+# Check dimension of qs
+dim(qs)
+# Check first few elements of qs with head
+head(qs)
+
+boxplot(qs)
+```
+
+```{r}
+library(ShortRead)
+fq = readFastq(fastqfiles[1])
+quality(fq)
+sum = qa(fastqfiles[1], type="fastq")
+browseURL(report(sum))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
