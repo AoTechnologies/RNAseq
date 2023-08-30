@@ -34,7 +34,8 @@ packages = c("Rsubread",
              "tidyverse",
              "DESeq2",
              "purrr",
-             "plotly")
+             "plotly",
+             "ShortRead")
 
 #Load Packages.
 ASpackaged(packages = packages)
@@ -66,6 +67,10 @@ SRAmeta = crawl_gsms(GSMnames)
 # Download fastq files to the fastq folder. Also extending the default time out as the server is quite slow.
 options(timeout=999999)
 res = get_fastqs(SRAmeta, "fastq")
+
+# Create a quality report on the fastq files.
+qaresults = qa(fastqs)
+report(qaresults,dest = "fastq/quality_report")
 
 # Cleanup
 rm(GSEtext, GSMnames, res)
@@ -370,3 +375,86 @@ sort(packages) %>%
     setNames(sort(packages)) %>%
     print(style = "text")
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
