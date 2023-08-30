@@ -34,16 +34,14 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">RNAseq Pipeline</h3>
 
   <p align="center">
-    project_description
+    An RNAseq Pipeline
     <br />
     <a href="https://github.com/AoTechnologies/RNAseq"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/AoTechnologies/RNAseq">View Demo</a>
-    ·
     <a href="https://github.com/AoTechnologies/RNAseq/issues">Report Bug</a>
     ·
     <a href="https://github.com/AoTechnologies/RNAseq/issues">Request Feature</a>
@@ -83,85 +81,53 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+An RNAseq pipeline I worked on for a internship at school. 
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+* [![biomaRt][biomaRt]][biomaRt-url]
+* [![DESeq2][DESeq2]][DESeq2-url]
+* [![GEOfastq][GEOfastq]][GEOfastq-url]
+* [![GEOquery][GEOquery]][GEOquery-url]
+* [![plotly][plotly]][plotly-url]
+* [![purrr][purrr]][purrr-url]
+* [![Rsubread][Rsubread]][Rsubread-url]
+* [![tidyverse][tidyverse]][tidyverse-url]
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+The file is a reproducable copy, open and run the code chunks in Rstudio. 
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+None
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+Reproducable Code. Run the Rmarkdown in Rstudio and required packages will install in the first code chunk. 
 
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+This pipeline was created to run the RNAseq data for the following accession.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
+None
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -179,7 +145,6 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -188,27 +153,23 @@ Don't forget to give the project a star! Thanks again!
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Aaron Olschefski - [Linkedin](http://www.linkedin.com/in/aaron-ols) - aaron1412@gmail.com
 
 Project Link: [https://github.com/AoTechnologies/RNAseq](https://github.com/AoTechnologies/RNAseq)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+* [Dr. Michael Edwards](https://www.bioinfosolutions.com/about)
+* [Dr. Tzu Phang](https://som.cuanschutz.edu/Profiles/Faculty/Profile/11531)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -229,19 +190,19 @@ Project Link: [https://github.com/AoTechnologies/RNAseq](https://github.com/AoTe
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: http://www.linkedin.com/in/aaron-ols
 [product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[biomaRt]: https://img.shields.io/badge/Bioconductor-biomaRt-blue
+[biomaRt-url]: https://bioconductor.org/packages/release/bioc/html/biomaRt.html
+[DESeq2]: https://img.shields.io/badge/Bioconductor-DESeq2-blue
+[DESeq2-url]:https://bioconductor.org/packages/release/bioc/html/DESeq2.html
+[GEOfastq]: https://img.shields.io/badge/Bioconductor-GEOfastq-blue
+[GEOfastq-url]:https://www.bioconductor.org/packages/release/bioc/html/GEOfastq.html
+[GEOquery]: https://img.shields.io/badge/Bioconductor-GEOquery-blue
+[GEOquery-url]:https://bioconductor.org/packages/release/bioc/html/GEOquery.html
+[plotly]: https://img.shields.io/badge/plotly-plotly-blue
+[plotly-url]:https://plotly.com
+[purrr]: https://img.shields.io/badge/tidyverse-purrr-blue
+[purrr-url]:https://purrr.tidyverse.org
+[Rsubread]: https://img.shields.io/badge/Bioconductor-Rsubread-blue
+[Rsubread-url]:https://bioconductor.org/packages/release/bioc/html/Rsubread.html
+[tidyverse]: https://img.shields.io/badge/tidyverse-tidyverse-blue
+[tidyverse-url]:https://www.tidyverse.org
