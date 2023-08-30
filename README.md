@@ -103,8 +103,6 @@ An RNAseq pipeline I worked on for a internship at school.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-The file is a reproducable copy, open and run the code chunks in Rstudio. 
-
 ### Prerequisites
 
 None
@@ -118,7 +116,7 @@ Reproducable Code. Run the Rmarkdown in Rstudio and required packages will insta
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-This pipeline was created to run the RNAseq data for the following accession.
+This pipeline was created to process raw fastq files from an RNAseq expirment that was ran on 2 lanes per sample.
 
 
 
