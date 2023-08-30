@@ -149,7 +149,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Feel free to use without any attached license, but kindly reference this file if you duplicate any work.
 
 
 
