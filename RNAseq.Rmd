@@ -53,7 +53,7 @@ buildindex(basename = "hg38",
 
 ```{r Download Fastq Files For ENA Record on GEO, message=FALSE}
 #Set the GEO accession ID.
-GEOnumber = "GSE233138"
+GEOnumber = "GSE153921"
 
 # Retrieve the GEO series containing the expression profiles for the experiment, including the test, control, and replicates.
 GSEtext = crawl_gse(GEOnumber)
